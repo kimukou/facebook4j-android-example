@@ -64,6 +64,8 @@ public class OAuthTask extends AsyncTask<Object, Void, OAuthWebView> {
     @Override
     protected void onProgressUpdate(Void... values) {
         Facebook facebook = mOAuthWebView.getFacebook();
+        facebook.setOAuthAppId("XXXXXXXXXX", "XXXXXXXXXXXXXXXXXXXX");		// TODO: put your "App ID" and "App Secret"
+        facebook.setOAuthPermissions("read_stream");
         String url = facebook.getOAuthAuthorizationURL(mCallbackURL.toString());
         mOAuthWebView.loadUrl(url);
     }
