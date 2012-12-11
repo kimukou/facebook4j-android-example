@@ -1,4 +1,4 @@
 debug=true
 oauth.appId=********
 oauth.appSecret=****************
-oauth.permissions=email,publish_stream
+oauth.permissions=read_stream
