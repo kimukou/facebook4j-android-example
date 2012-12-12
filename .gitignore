@@ -8,6 +8,4 @@ gen/
 local.properties
 .settings/
 target/
-.classpath
-.project
 facebook4j.properties

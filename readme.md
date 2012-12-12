@@ -18,3 +18,14 @@ Import this project to Eclipse, and convert to Maven Project (Right-click on pro
 4. Rename facebook4j.properties-template to facebook4j.properties on src/main/resources directory
 5. Set 'oauth.appId' and 'oauth.appSecret'
 6. Run as Android Application
+
+
+---------------------------------------------------------
+
+append note)
+need setting/ad_key_mst.xml => values/ad_key.xml
+add write api-key
+
+
+check) 
+Galaxy Note Android 2.2

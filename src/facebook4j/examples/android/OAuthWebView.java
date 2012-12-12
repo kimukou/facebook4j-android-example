@@ -31,19 +31,23 @@ import facebook4j.Facebook;
 public class OAuthWebView extends WebView {
     private Callback mCallback;
     private Facebook mFacebook;
-
+    private Context context_;
+    
     public OAuthWebView(Context context) {
         super(context);
+        context_ = context;
         init();
     }
 
     public OAuthWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        context_ = context;
         init();
     }
 
     public OAuthWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        context_ = context;
         init();
     }
 
@@ -65,7 +69,7 @@ public class OAuthWebView extends WebView {
     public void start(Callback callback) {
         mCallback = callback;
         try {
-            new OAuthTask().execute(this, new URL("http://facebook4j.org/"));
+            new OAuthTask(context_).execute(this, new URL("http://facebook4j.org/"));
         } catch (MalformedURLException ignore) {}
     }
 

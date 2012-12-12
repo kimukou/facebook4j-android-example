@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.concurrent.CountDownLatch;
 
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.webkit.WebView;
@@ -40,6 +42,17 @@ public class OAuthTask extends AsyncTask<Object, Void, OAuthWebView> {
     private String mCode;
     private CountDownLatch mLatch = new CountDownLatch(1);
 
+    private String fb_appId;
+    private String fb_appSecret;
+    private String fb_permissions;
+    public OAuthTask(Context context){
+    	Resources m_r = context.getResources();
+    	fb_appId = m_r.getString(R.string.fb_appId);
+    	fb_appSecret = m_r.getString(R.string.fb_appSecret);
+    	fb_permissions = m_r.getString(R.string.fb_permissions);
+    }
+    
+    
     @Override
     protected OAuthWebView doInBackground(Object... params) {
         mOAuthWebView = (OAuthWebView) params[0];
@@ -64,6 +77,9 @@ public class OAuthTask extends AsyncTask<Object, Void, OAuthWebView> {
     @Override
     protected void onProgressUpdate(Void... values) {
         Facebook facebook = mOAuthWebView.getFacebook();
+        //patch merge https://github.com/ryosms/facebook4j-android-example/commit/4b1692eaa0a5b3276c3ccfc987e354661a37e13d
+        facebook.setOAuthAppId(fb_appId, fb_appSecret);    // TODO: put your "App ID" and "App Secret"
+        facebook.setOAuthPermissions(fb_permissions);//"read_stream");
         String url = facebook.getOAuthAuthorizationURL(mCallbackURL.toString());
         mOAuthWebView.loadUrl(url);
     }
