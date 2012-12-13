@@ -20,14 +20,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import facebook4j.Facebook;
 import facebook4j.Post;
 
@@ -51,11 +55,44 @@ public class NewsFeedActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Post post = mFeed.get(position);
+        PostDetail(post);
+/*        
         Intent intent = new Intent(this, PostDetailActivity.class);
         intent.putExtra("FROM", post.getFrom().getName());
         intent.putExtra("MESSAGE", post.getMessage());
         startActivity(intent);
+*/        
     }
+    
+	private Dialog mDialog = null;
+	protected void PostDetail(Post post){
+		if(mDialog!=null){
+			try{
+				mDialog.dismiss();
+			}catch(Exception ex){mDialog.cancel();}
+		}
+
+		mDialog = new Dialog(this);
+		mDialog.setContentView(R.layout.post_detail);
+
+		mDialog.setOnKeyListener(new OnKeyListener() {
+			@Override
+			public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent e) {
+		        if(e.getKeyCode() != KeyEvent.KEYCODE_BACK) return false;
+	        	if(e.getAction() != KeyEvent.ACTION_DOWN)return false;
+            	mDialog.cancel();
+            	mDialog = null;
+		        return false;
+			}
+		});
+		
+		TextView mFrom = (TextView) mDialog.findViewById(R.id.post_detail_from);
+        mFrom.setText(post.getFrom().getName());
+        TextView mMessage = (TextView) mDialog.findViewById(R.id.post_detail_message);
+        mMessage.setText(post.getMessage());
+
+    	mDialog.show();
+	}
 
     // Adds 'Refresh' menu
     @Override
@@ -104,8 +141,9 @@ public class NewsFeedActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (RequestCode.getInstance(requestCode)) {
         case OAuth:
+        	if(data==null)break;
             Bundle extras = data.getExtras();
-            mFacebook = (Facebook) extras.get(OAuthActivity.DATA_KEY_FACEBOOK);
+            mFacebook = (Facebook) extras.get(facebook_main.DATA_KEY_FACEBOOK);
             getFeed();
             break;
         default:
@@ -133,6 +171,16 @@ public class NewsFeedActivity extends ListActivity {
             return null;
         }
         
+    }
+    
+	@Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+			onDestroy();
+			android.os.Process.killProcess(android.os.Process.myPid());
+			return false;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

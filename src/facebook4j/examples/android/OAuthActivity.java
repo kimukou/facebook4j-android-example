@@ -26,8 +26,6 @@ import facebook4j.Facebook;
  */
 public class OAuthActivity extends Activity implements OAuthWebView.Callback {
     
-    public static final String DATA_KEY_FACEBOOK = "facebook";
-
     private OAuthWebView mOAuthWebView;
 
     @Override
@@ -41,7 +39,7 @@ public class OAuthActivity extends Activity implements OAuthWebView.Callback {
     @Override
     public void onSuccess(Facebook facebook) {
         Intent data = new Intent();
-        data.putExtra(DATA_KEY_FACEBOOK, facebook);
+        data.putExtra(facebook_main.DATA_KEY_FACEBOOK, facebook);
         setResult(RESULT_OK, data);
         finish();
     }

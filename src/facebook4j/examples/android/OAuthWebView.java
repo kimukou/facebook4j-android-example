@@ -69,7 +69,8 @@ public class OAuthWebView extends WebView {
     public void start(Callback callback) {
         mCallback = callback;
         try {
-            new OAuthTask(context_).execute(this, new URL("http://facebook4j.org/"));
+            //new OAuthTask().execute(this, new URL("http://facebook4j.org/"));
+            new OAuthTask(context_).execute(this, new URL(context_.getResources().getString(R.string.fb_login_url)));
         } catch (MalformedURLException ignore) {}
     }
 

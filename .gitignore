@@ -9,3 +9,4 @@ local.properties
 .settings/
 target/
 facebook4j.properties
+ad_key.xml

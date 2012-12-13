@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="fb_appId">473364439362043</string>
-    <string name="fb_appSecret">f7a752dafedd4c4f848ce4921c9f2d6a</string>
-    <string name="fb_permissions">email,publish_stream,read_stream</string>
-    
-</resources>
