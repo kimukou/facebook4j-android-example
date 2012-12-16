@@ -5,4 +5,6 @@
     <string name="app_name">facebook4j-android-example</string>
     <string name="hello_world">Hello world!</string>
 
+    <string name="sts_login">login</string>
+    <string name="sts_logout">logout</string>
 </resources>

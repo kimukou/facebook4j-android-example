@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android;
+package facebook4j.examples.android.adapter;
 
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import facebook4j.Facebook;
 import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
+import facebook4j.examples.android.NewsFeedActivity;
+import facebook4j.examples.android.sns.facebook_main;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-@TargetApi(3)
 public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
-    private static final int FEED_LIMIT = 10;
 
-    private Facebook mFacebook;
+    //private Facebook mFacebook;
     private NewsFeedActivity mActivity;
     private NewsFeedAdapter mAdapter;
     private ProgressDialog mProgressDialog;
-    private Throwable t = null;
+    //private Throwable t = null;
 
-    public NewsFeedReaderTask(Facebook facebook, NewsFeedActivity activity, NewsFeedAdapter adapter) {
-        mFacebook = facebook;
+    //public NewsFeedReaderTask(Facebook facebook, NewsFeedActivity activity, NewsFeedAdapter adapter) {
+    public NewsFeedReaderTask(NewsFeedActivity activity, NewsFeedAdapter adapter) {
+        //mFacebook = facebook;
         mActivity = activity;
         mAdapter = adapter;
     }
@@ -52,15 +51,17 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
 
     @Override
     protected NewsFeedAdapter doInBackground(Void... params) {
+    	if(facebook_main.m_facebook==null)return null;
         try {
-            ResponseList<Post> feed = mFacebook.getHome(new Reading()
+            ResponseList<Post> feed = facebook_main.m_facebook.getHome(new Reading()
                                                         .fields("from", "message")
-                                                        .limit(FEED_LIMIT));
+                                                        .limit(facebook_main.FEED_LIMIT));
             for (Post post : feed) {
                 mAdapter.add(post);
             }
         } catch (Throwable t) {
-            this.t = t;
+        	mAdapter = null;
+            //this.t = t;
         }
         return mAdapter;
     }
@@ -68,10 +69,10 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
     @Override
     protected void onPostExecute(NewsFeedAdapter result) {
         mProgressDialog.dismiss();
-        if (t != null) {
-            mActivity.onError(t);
-            return;
-        }
+//        if (t != null) {
+//            mActivity.onError(t);
+//            return;
+//        }
         mActivity.setListAdapter(result);
     }
 

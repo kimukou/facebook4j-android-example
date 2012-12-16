@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android;
+package facebook4j.examples.android.sns;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,14 +24,14 @@ import facebook4j.Facebook;
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-public class OAuthActivity extends Activity implements OAuthWebView.Callback {
+public class AuthFbActivity extends Activity implements AuthFbWebView.Callback {
     
-    private OAuthWebView mOAuthWebView;
+    private AuthFbWebView mOAuthWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mOAuthWebView = new OAuthWebView(this);
+        mOAuthWebView = new AuthFbWebView(this);
         setContentView(mOAuthWebView);
         mOAuthWebView.start(this);
     }
@@ -39,7 +39,8 @@ public class OAuthActivity extends Activity implements OAuthWebView.Callback {
     @Override
     public void onSuccess(Facebook facebook) {
         Intent data = new Intent();
-        data.putExtra(facebook_main.DATA_KEY_FACEBOOK, facebook);
+        //data.putExtra(facebook_main.DATA_KEY_FACEBOOK, facebook);
+        data.putExtra("State",facebook_main.m_accessToken ==null ? 0:1);//成功した時
         setResult(RESULT_OK, data);
         finish();
     }

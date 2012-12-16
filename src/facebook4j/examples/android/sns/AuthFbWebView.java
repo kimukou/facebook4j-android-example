@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android;
+package facebook4j.examples.android.sns;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,26 +28,22 @@ import facebook4j.Facebook;
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-public class OAuthWebView extends WebView {
+public class AuthFbWebView extends WebView {
     private Callback mCallback;
     private Facebook mFacebook;
-    private Context context_;
     
-    public OAuthWebView(Context context) {
+    public AuthFbWebView(Context context) {
         super(context);
-        context_ = context;
         init();
     }
 
-    public OAuthWebView(Context context, AttributeSet attrs) {
+    public AuthFbWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        context_ = context;
         init();
     }
 
-    public OAuthWebView(Context context, AttributeSet attrs, int defStyle) {
+    public AuthFbWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        context_ = context;
         init();
     }
 
@@ -70,7 +66,7 @@ public class OAuthWebView extends WebView {
         mCallback = callback;
         try {
             //new OAuthTask().execute(this, new URL("http://facebook4j.org/"));
-            new OAuthTask(context_).execute(this, new URL(context_.getResources().getString(R.string.fb_login_url)));
+            new AuthFbTask().execute(this, new URL(facebook_main.FB_LOGIN_URL));
         } catch (MalformedURLException ignore) {}
     }
 

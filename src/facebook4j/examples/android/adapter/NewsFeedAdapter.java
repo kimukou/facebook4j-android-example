@@ -14,46 +14,77 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android;
+package facebook4j.examples.android.adapter;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import facebook4j.Post;
+import facebook4j.examples.android.R;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
 public class NewsFeedAdapter extends ArrayAdapter<Post> {
     private LayoutInflater mInflater;
-    private TextView mFrom;
-    private TextView mMessage;
+    private int layoutId;
+	private View layView = null;
 
-    public NewsFeedAdapter(Context context, List<Post> objects) {
+	
+    //public NewsFeedAdapter(Context context, List<Post> objects) {
+    public NewsFeedAdapter(Activity context, List<Post> objects) {
         super(context, 0, objects);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutId = R.layout.feed_row;
+		layView = context.getLayoutInflater().inflate(layoutId, null);
     }
+    
+	static class ViewHolder {  
+	    TextView mFrom;  
+		TextView mMessage;
+	}  
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
 
-        if (convertView == null) {
-            view = mInflater.inflate(R.layout.feed_row, null);
+		ViewHolder holder;
+		View rowView = convertView;
+	    TextView mFrom = null;
+	    TextView mMessage = null;
+
+        if (rowView == null) {
+        	try {
+				rowView = mInflater.inflate(layoutId, parent, false);
+			} catch (Exception e) {
+				rowView = layView; //一部の機種でinflaterできずNullPointerで落ちる事が有るためその代替
+			}
+            holder = new ViewHolder();
+            LinearLayout ln = (LinearLayout)rowView;
+            mFrom= (TextView)ln.getChildAt(0);
+            mMessage= (TextView)ln.getChildAt(1);
+            holder.mFrom = mFrom;
+            holder.mMessage = mMessage;
+            rowView.setTag(holder);
+        }
+        else{
+            holder = (ViewHolder) rowView.getTag();
+            mFrom = holder.mFrom;
+            mMessage = holder.mMessage;
         }
 
         Post post = this.getItem(position);
         if (post != null) {
-            mFrom = (TextView) view.findViewById(R.id.post_from);
             mFrom.setText(post.getFrom().getName());
-            mMessage = (TextView) view.findViewById(R.id.post_message);
             mMessage.setText(post.getMessage() == null ? "" : post.getMessage());
         }
-        return view;
+        return rowView;
     }
 }

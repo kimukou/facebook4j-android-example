@@ -13,4 +13,10 @@
         android:id="@+id/post_detail_message"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+    <Button
+    	android:text="OK"
+        android:id="@+id/post_detail_ok"
+    	android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+    	
 </LinearLayout>
