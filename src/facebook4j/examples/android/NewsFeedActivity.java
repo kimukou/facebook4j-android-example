@@ -108,7 +108,6 @@ public class NewsFeedActivity extends BaseActivity {
 		
 		mDialog.setContentView(R.layout.post_detail);
 
-		mDialog.setTitle(m_r.getString(R.string.app_name));
 		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.icon);
 
 		mDialog.setOnKeyListener(new OnKeyListener() {
@@ -131,16 +130,21 @@ public class NewsFeedActivity extends BaseActivity {
 			}
 		});
 		
-		TextView mFrom = (TextView) mDialog.findViewById(R.id.post_detail_from);
+//		TextView mFrom = (TextView) mDialog.findViewById(R.id.post_detail_from);
         TextView mMessage = (TextView) mDialog.findViewById(R.id.post_detail_message);
+        String title="";
 		if(post!=null){
-	        mFrom.setText(post.getFrom().getName());
+//	        mFrom.setText(post.getFrom().getName());
+			title = post.getFrom().getName();
 	        mMessage.setText(post.getMessage());
 		}
 		else{
-	        mFrom.setText("Failture");
+//	        mFrom.setText("Failture");
+			title="Failture";
 	        mMessage.setText("Can't Get PostData");
 		}
+		mDialog.setTitle(title);
+
 		
 
 		DisplayMetrics metrics = m_r.getDisplayMetrics();  

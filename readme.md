@@ -22,10 +22,17 @@ Import this project to Eclipse, and convert to Maven Project (Right-click on pro
 
 ---------------------------------------------------------
 
-append note)
-need setting/ad_key_mst.xml => values/ad_key.xml
-add write api-key
+# append note for Android Project mod ver kimukou
+
+## need
+
+copy setting/ad_key_mst.xml => values/ad_key.xml
+add write 
+
+- App ID
+- App Secret
+- site-url
 
 
-check) 
-Galaxy Note Android 2.2
+check hard) 
+- Galaxy Note Android 2.2
