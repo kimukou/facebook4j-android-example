@@ -4,16 +4,34 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- 
     <TextView
         android:id="@+id/post_detail_from"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+ -->    
+ <ScrollView 
+    android:layout_width="fill_parent" 
+    android:layout_marginLeft="10dip"
+    android:layout_marginRight="10dip"
+    android:layout_height="200dip"
+    android:fastScrollEnabled="true" >
     <TextView
         android:id="@+id/post_detail_message"
+        android:gravity="left"
+        android:ellipsize="none"
+        android:inputType="textMultiLine"
+        android:scrollHorizontally="false"
+	    android:textSize="18dip"
+	    android:textColor="@color/white"
+	    android:focusableInTouchMode="false"
+		android:autoLink="web"
+  		android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
-    <Button
+</ScrollView>
+<Button
     	android:text="OK"
         android:id="@+id/post_detail_ok"
     	android:layout_width="fill_parent"

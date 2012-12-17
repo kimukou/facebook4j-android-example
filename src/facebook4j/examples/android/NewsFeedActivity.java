@@ -16,6 +16,7 @@
 
 package facebook4j.examples.android;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +37,13 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.loopj.android.image.SmartImageView;
+
+import facebook4j.FacebookException;
 import facebook4j.Post;
+import facebook4j.Reading;
+import facebook4j.User;
 import facebook4j.examples.android.adapter.NewsFeedAdapter;
 import facebook4j.examples.android.adapter.NewsFeedReaderTask;
 import facebook4j.examples.android.android_super.BaseActivity;
@@ -48,6 +56,7 @@ import facebook4j.examples.android.sns.facebook_main;
  */
 public class NewsFeedActivity extends BaseActivity {
 
+	private final String TAG = getClass().getSimpleName();
     private List<Post> mFeed;
     private NewsFeedAdapter mAdapter;
     private Resources m_r;
@@ -60,13 +69,22 @@ public class NewsFeedActivity extends BaseActivity {
         facebook_main.init(this);
         facebook_main.loginOAuth();
         if(facebook_main.isFacebookLogin()){
-        	Button btn = _findViewById(R.id.button_login);
-        	btn.setText(m_r.getString(R.string.sts_logout));
+        	getProfile();
             getFeed();
         }
         else{
         	startOAuth();
         }
+    }
+
+	
+    public void onClickSearch(View v){
+    	
+    }
+	
+	
+    public void onClickPostSelect(View v){
+    	
     }
     
     public void onClickStsChange(View v){
@@ -145,19 +163,13 @@ public class NewsFeedActivity extends BaseActivity {
 		}
 		mDialog.setTitle(title);
 
-		
-
 		DisplayMetrics metrics = m_r.getDisplayMetrics();  
 		int dialogWidth = (int) (metrics.widthPixels * 0.9); 
-/*		
-		int dialogHeight = (int) (metrics.heightPixels * 0.45);  
-		int dlg_ask_height_p = m_r.getInteger(R.integer.dlg_ask_height_p);
-		if("KDDI".equals(Build.BRAND) && "IS03".equals(Build.MODEL))dlg_ask_height_p += 5;
-		int dialogHeight = (int) (metrics.heightPixels * dlg_ask_height_p * 1/100); 
-*/		 
+		int dialogHeight = (int) (metrics.heightPixels * 0.7);  
+		
 		WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();  
 	    lp.width = dialogWidth;  
-	    //lp.height =dialogHeight;
+	    lp.height =dialogHeight;
 	    mDialog.getWindow().setAttributes(lp);  
 
     	mDialog.show();
@@ -210,10 +222,7 @@ public class NewsFeedActivity extends BaseActivity {
             public void onResult(int resultCode, Intent data) {
             	final int state = data==null ? 0:data.getIntExtra("State",0);
             	if(state==1){
-                	Button btn = _findViewById(R.id.button_login);
-                	btn.setText(m_r.getString(R.string.sts_logout));
-                    //Bundle extras = data.getExtras();
-                    //mFacebook = (Facebook) extras.get(facebook_main.DATA_KEY_FACEBOOK);
+                	getProfile();
                     getFeed();
             	}
             }
@@ -269,6 +278,28 @@ public class NewsFeedActivity extends BaseActivity {
 	@SuppressWarnings("unchecked")
 	protected <T extends View> T _findViewById(final int id){
 	    return (T)findViewById(id);
+	}
+
+	
+    //see http://facebook4j.org/en/javadoc/facebook4j/api/UserMethods.html#getUser(java.lang.String)
+	private void getProfile() {
+		try {
+			User user = facebook_main.m_facebook.getMe(new Reading().fields("picture","name"));
+			//User user = facebook_main.m_facebook.getUser(facebook_main.m_facebook.getId()); //△(pictureが取れない)
+			URL url = user.getPicture()==null? null : user.getPicture().getURL();
+			//URL url = facebook_main.m_facebook.getPictureURL();
+			if(url!=null){
+				SmartImageView iv = _findViewById(R.id.user_image);
+				iv.setImageUrl(url.toString());
+			}
+			TextView tx = _findViewById(R.id.user_name);
+			tx.setText(user.getName());
+		} catch (FacebookException e) {
+			Log.e(TAG, "getProfile",e);
+			e.printStackTrace();
+		}
+		Button btn = _findViewById(R.id.button_login);
+		btn.setText(m_r.getString(R.string.sts_logout));
 	}
 
 }
