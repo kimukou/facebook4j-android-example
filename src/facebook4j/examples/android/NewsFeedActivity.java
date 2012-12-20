@@ -50,6 +50,7 @@ import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.examples.android.adapter.NewsFeedAdapter;
 import facebook4j.examples.android.adapter.NewsFeedReaderTask;
+import facebook4j.examples.android.adapter.NewsPostTask;
 import facebook4j.examples.android.adapter.NewsSearchTask;
 import facebook4j.examples.android.android_super.BaseActivity;
 import facebook4j.examples.android.android_super.OnActivityResultCallback;
@@ -152,11 +153,16 @@ public class NewsFeedActivity extends BaseActivity {
 	    					   String word = "";
 	    		        	   switch(spinner_id){
 	    	       	   			case R.id.spinner_post:
-	    	       	   				((Button)pv).setText(selected_str);
+	    	       	   				{
+	    	       	   					EditText mMessage = (EditText) choiceDlg.findViewById(R.id.EditMsg);
+	    	       	   					word = mMessage.getText().toString();
+	    	       	   				}
 	    	       	   				break;
 	    			   			case R.id.spinner_search:
-	    			        		EditText mMessage = (EditText) choiceDlg.findViewById(R.id.EditMsg);
-	    			        		word = mMessage.getText().toString();
+	    			   				{
+	    			   					EditText mMessage = (EditText) choiceDlg.findViewById(R.id.EditMsg);
+	    			   					word = mMessage.getText().toString();
+	    			   				}
 	    			   				break;
 	    		        	   }
 	    		        	   
@@ -164,7 +170,7 @@ public class NewsFeedActivity extends BaseActivity {
 	    		        	   choiceDlg=null;
 	    		        	   switch(spinner_id){
 	    			   			case R.id.spinner_post:
-	    			   				postAction(selected_pos);
+	    			   				postAction(selected_pos,word);
 	    			   				break;
 	    			   			case R.id.spinner_search:
 	    			            	getSearch(selected_pos,word);
@@ -389,7 +395,7 @@ public class NewsFeedActivity extends BaseActivity {
     //		http://facebook4j.org/en/javadoc/facebook4j/api/PostMethods.html#postFeed(facebook4j.PostUpdate) ですね。
     //		PostUpdateのpictureに画像URLを入れる感じです。
     //		アップロードなら http://facebook4j.org/en/javadoc/facebook4j/api/PhotoMethods.html#postPhoto(facebook4j.Media) です。
-    private void postAction(int post_mode) {
+    private void postAction(int post_mode,String word) {
     	switch(post_mode){
     		case facebook_main.POST_STATUS:
     			break;
@@ -398,6 +404,8 @@ public class NewsFeedActivity extends BaseActivity {
     		case facebook_main.POST_FEED:
     			break;
     	}
+        NewsPostTask task = new NewsPostTask(this, post_mode);
+        task.execute(word);
     }
     
     
