@@ -22,6 +22,21 @@ public class facebook_main {
     public static final String DATA_KEY_FACEBOOK = "facebook";
     public static final int FEED_LIMIT = 10;
 
+    //検索系
+    public static final int SEACH_POSTS = 0;
+    public static final int SEACH_USERS = 1;
+    public static final int SEACH_PLACES =2;
+    public static final int SEACH_LOCATIONS =3;
+    public static final int SEACH_EVENTS =4;
+    public static final int SEACH_GROUPS =5;
+    public static final int SEACH_CHECKINS =6;
+
+    //投稿系
+    public static final int POST_STATUS = 0;
+    public static final int POST_PHOTE = 1;
+    public static final int POST_FEED =2;
+    
+    
     public static String FB_APPID;
     public static String FB_APPSECRET;
     public static String FB_PERMISSIONS;

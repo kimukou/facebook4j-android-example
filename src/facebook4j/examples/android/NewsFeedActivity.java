@@ -32,10 +32,14 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.loopj.android.image.SmartImageView;
@@ -46,6 +50,7 @@ import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.examples.android.adapter.NewsFeedAdapter;
 import facebook4j.examples.android.adapter.NewsFeedReaderTask;
+import facebook4j.examples.android.adapter.NewsSearchTask;
 import facebook4j.examples.android.android_super.BaseActivity;
 import facebook4j.examples.android.android_super.OnActivityResultCallback;
 import facebook4j.examples.android.sns.AuthFbActivity;
@@ -79,12 +84,11 @@ public class NewsFeedActivity extends BaseActivity {
 
 	
     public void onClickSearch(View v){
-    	
+        choiceDlgShow(R.layout.spinner_search,R.id.spinner_search,v);
     }
 	
-	
     public void onClickPostSelect(View v){
-    	
+        choiceDlgShow(R.layout.spinner_post,R.id.spinner_post,v);
     }
     
     public void onClickStsChange(View v){
@@ -98,6 +102,111 @@ public class NewsFeedActivity extends BaseActivity {
     		startOAuth();
     	}
     }
+    
+    private int selected_pos = 0;
+    private String selected_str = "";
+	private Dialog choiceDlg = null;
+	private void choiceDlgShow(final int layout_id,final int spinner_id,final View pv) {
+		  if(choiceDlg!=null){
+			  choiceDlg.dismiss();
+			  choiceDlg = null;
+		  }
+
+	       choiceDlg = new Dialog(this);
+	       //choiceDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	       choiceDlg.setContentView(layout_id);
+	       
+    	   switch(spinner_id){
+	   			case R.id.spinner_post:
+	   				choiceDlg.setTitle("postmode");
+	   				break;
+	   			case R.id.spinner_search:
+	   				choiceDlg.setTitle("searchmode");
+	   				break;
+    	   }
+
+	       choiceDlg.setOnKeyListener(new OnKeyListener() {
+				@Override
+				public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent e) {
+					Log.v(TAG, "choiceDlg onKey");
+			        if(e.getKeyCode() != KeyEvent.KEYCODE_BACK) return false;
+		        	if(e.getAction() != KeyEvent.ACTION_DOWN)return false;
+	            	Log.v(TAG, "onKey ACTION_DOWN KEYCODE_BACK");
+	            	choiceDlg.cancel();
+	            	choiceDlg = null;
+			        return false;
+				}
+			});
+
+	       choiceDlg.findViewById(R.id.ChoiceCancel).setOnClickListener(
+	    			new OnClickListener() {
+	    				public void onClick(View v) {
+	    					choiceDlg.dismiss();
+	    					choiceDlg = null;
+	    				}
+	    			});
+
+	       choiceDlg.findViewById(R.id.ChoiceOK).setOnClickListener(
+	    			new OnClickListener() {
+	    				public void onClick(View v) {
+	    					   String word = "";
+	    		        	   switch(spinner_id){
+	    	       	   			case R.id.spinner_post:
+	    	       	   				((Button)pv).setText(selected_str);
+	    	       	   				break;
+	    			   			case R.id.spinner_search:
+	    			        		EditText mMessage = (EditText) choiceDlg.findViewById(R.id.EditMsg);
+	    			        		word = mMessage.getText().toString();
+	    			   				break;
+	    		        	   }
+	    		        	   
+	    		        	   choiceDlg.dismiss();
+	    		        	   choiceDlg=null;
+	    		        	   switch(spinner_id){
+	    			   			case R.id.spinner_post:
+	    			   				postAction(selected_pos);
+	    			   				break;
+	    			   			case R.id.spinner_search:
+	    			            	getSearch(selected_pos,word);
+	    			   				break;
+	    		        	   }
+
+	    				}
+	    			});
+
+	       Spinner spinner = (Spinner) choiceDlg.findViewById(spinner_id);
+    	   switch(spinner_id){
+	   			case R.id.spinner_post:
+	   				spinner.setSelection(selected_pos);
+   	   				break;
+    	   }
+
+
+	       // スピナーのアイテムが選択された時に呼び出されるコールバックリスナーを登録します
+	       spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+	            @Override
+	            public void onItemSelected(AdapterView<?> parent, View view,
+	                    int position, long id) {
+	                Spinner spinner = (Spinner) parent;
+	                String item = (String) spinner.getSelectedItem();
+	                selected_str = item;
+	                selected_pos = position;
+	            }
+	            @Override
+	            public void onNothingSelected(AdapterView<?> arg0) {
+	            }
+	       });
+
+	        DisplayMetrics metrics = m_r.getDisplayMetrics();  
+			int dialogWidth = (int) (metrics.widthPixels * 0.9);  
+			//int dialogHeight = (int) (metrics.heightPixels * 0.3);  
+			WindowManager.LayoutParams lp = choiceDlg.getWindow().getAttributes();  
+		    lp.width = dialogWidth;  
+		    //lp.height =dialogHeight;
+		    choiceDlg.getWindow().setAttributes(lp);  
+	       choiceDlg.show();
+	}
+    
 
     // Starts PostDetailActivity.
     @Override
@@ -175,6 +284,7 @@ public class NewsFeedActivity extends BaseActivity {
     	mDialog.show();
 	}
 
+
     // Adds 'Refresh' menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -205,31 +315,8 @@ public class NewsFeedActivity extends BaseActivity {
                .show();
     }
 */
-    
-    private void getFeed() {
-        mFeed = new ArrayList<Post>();
-        mAdapter = new NewsFeedAdapter(this, mFeed);
-        NewsFeedReaderTask task = new NewsFeedReaderTask(this, mAdapter);
-        task.execute();
-    }
 
-    // Starts OAuthActivity. This method is invoked from AlertDialog's callback in onError() method.
-    private void startOAuth() {
-        Intent intent = new Intent(this, AuthFbActivity.class);
-        //startActivityForResult(intent, RequestCode.OAuth.code);
-    	startActivityForCallback(intent, new OnActivityResultCallback() {
-            // ここで値を受け取れる
-            public void onResult(int resultCode, Intent data) {
-            	final int state = data==null ? 0:data.getIntExtra("State",0);
-            	if(state==1){
-                	getProfile();
-                    getFeed();
-            	}
-            }
-    	});
-
-    }
-/*
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -265,6 +352,55 @@ public class NewsFeedActivity extends BaseActivity {
         
     }
 */    
+    // Starts OAuthActivity. This method is invoked from AlertDialog's callback in onError() method.
+    private void startOAuth() {
+        Intent intent = new Intent(this, AuthFbActivity.class);
+        //startActivityForResult(intent, RequestCode.OAuth.code);
+    	startActivityForCallback(intent, new OnActivityResultCallback() {
+            // ここで値を受け取れる
+            public void onResult(int resultCode, Intent data) {
+            	final int state = data==null ? 0:data.getIntExtra("State",0);
+            	if(state==1){
+                	getProfile();
+                    getFeed();
+            	}
+            }
+    	});
+
+    }
+    
+    private void getFeed() {
+        mFeed = new ArrayList<Post>();
+        mAdapter = new NewsFeedAdapter(this, mFeed);
+        NewsFeedReaderTask task = new NewsFeedReaderTask(this, mAdapter);
+        task.execute();
+    }
+    
+//=====================================================================================
+
+    private void getSearch(int search_mode,String word) {
+        mFeed = new ArrayList<Post>();
+        mAdapter = new NewsFeedAdapter(this, mFeed);
+        NewsSearchTask task = new NewsSearchTask(this, mAdapter,search_mode);
+        task.execute(word);
+    }
+
+    //see	 https://developers.facebook.com/docs/reference/api/post/
+    //		http://facebook4j.org/en/javadoc/facebook4j/api/PostMethods.html#postFeed(facebook4j.PostUpdate) ですね。
+    //		PostUpdateのpictureに画像URLを入れる感じです。
+    //		アップロードなら http://facebook4j.org/en/javadoc/facebook4j/api/PhotoMethods.html#postPhoto(facebook4j.Media) です。
+    private void postAction(int post_mode) {
+    	switch(post_mode){
+    		case facebook_main.POST_STATUS:
+    			break;
+    		case facebook_main.POST_PHOTE:
+    			break;
+    		case facebook_main.POST_FEED:
+    			break;
+    	}
+    }
+    
+    
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){

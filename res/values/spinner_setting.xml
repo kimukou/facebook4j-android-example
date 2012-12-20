@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="post_navi_type">
+		<item>postStatusMessage</item>
+		<item>postPhoto</item>
+		<item>postFeed</item>
+	</string-array>
+    
+    <string-array name="search_navi_type">
+		<item>searchPosts</item>
+		<item>searchUsers</item>
+		<item>searchPlaces</item>
+		<item>searchLocations</item>
+		<item>searchEvents</item>
+		<item>searchGroups</item>
+		<item>searchCheckins</item>
+	</string-array>
+    
+    
+</resources>
