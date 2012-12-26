@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.util.Log;
 import facebook4j.Facebook;
 import facebook4j.FacebookFactory;
+import facebook4j.Paging;
 import facebook4j.auth.AccessToken;
 import facebook4j.conf.ConfigurationBuilder;
 import facebook4j.examples.android.R;
@@ -21,7 +22,7 @@ import facebook4j.examples.android.R;
 public class facebook_main {
     public static final String DATA_KEY_FACEBOOK = "facebook";
     public static final int FEED_LIMIT = 10;
-
+    
     //検索系
     public static final int SEACH_POSTS = 0;
     public static final int SEACH_USERS = 1;
@@ -30,6 +31,11 @@ public class facebook_main {
     public static final int SEACH_EVENTS =4;
     public static final int SEACH_GROUPS =5;
     public static final int SEACH_CHECKINS =6;
+
+    public static final int GET_HOME = 30;
+
+    //FEEDの状態
+    public static int FEED_MODE =GET_HOME;
 
     //投稿系
     public static final int POST_STATUS = 0;
@@ -43,6 +49,8 @@ public class facebook_main {
     public static String FB_LOGIN_URL;
     
     public static Facebook m_facebook;
+    public static Paging<?> paging;
+    
     public static AccessToken m_accessToken;
     
 	private static String TAG = "facebook_main";

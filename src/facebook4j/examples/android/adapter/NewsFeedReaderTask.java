@@ -48,19 +48,27 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
         mProgressDialog.setMessage("Now Loading...");
         mProgressDialog.show();
     }
-
+    
+    //see 	http://facebook4j.org/ja/code-examples.html
+    //		field https://developers.facebook.com/docs/reference/api/post/
     @Override
     protected NewsFeedAdapter doInBackground(Void... params) {
     	if(facebook_main.m_facebook==null)return null;
+    	Reading rd = new Reading().fields(
+				"from", "message","message_tags","picture"
+			)
+			.limit(facebook_main.FEED_LIMIT);
         try {
-            ResponseList<Post> feed = facebook_main.m_facebook.getHome(new Reading()
-                                                        .fields("from", "message")
-                                                        .limit(facebook_main.FEED_LIMIT));
+            ResponseList<Post> feed = facebook_main.m_facebook.getHome(
+            			rd
+            		);
             for (Post post : feed) {
                 mAdapter.add(post);
             }
+            facebook_main.paging = feed.getPaging(); //ページング情報セット
         } catch (Throwable t) {
         	mAdapter = null;
+        	facebook_main.paging = null;
             //this.t = t;
         }
         return mAdapter;

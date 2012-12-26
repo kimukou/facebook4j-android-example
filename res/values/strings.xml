@@ -7,4 +7,5 @@
 
     <string name="sts_login">login</string>
     <string name="sts_logout">logout</string>
+    <string name="footer_text">Next Reading</string>
 </resources>

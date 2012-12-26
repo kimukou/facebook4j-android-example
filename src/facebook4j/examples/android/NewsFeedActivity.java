@@ -25,6 +25,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -42,11 +45,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.loopj.android.image.SmartImageView;
 
 import facebook4j.FacebookException;
 import facebook4j.Post;
 import facebook4j.Reading;
+import facebook4j.ResponseList;
 import facebook4j.User;
 import facebook4j.examples.android.adapter.NewsFeedAdapter;
 import facebook4j.examples.android.adapter.NewsFeedReaderTask;
@@ -63,7 +69,7 @@ import facebook4j.examples.android.sns.facebook_main;
 public class NewsFeedActivity extends BaseActivity {
 
 	private final String TAG = getClass().getSimpleName();
-    private List<Post> mFeed;
+    private List<Object> mFeed;
     private NewsFeedAdapter mAdapter;
     private Resources m_r;
     
@@ -71,6 +77,15 @@ public class NewsFeedActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+
+        // アダプターをセットする前にフッターをセット
+        ListView listView = getListView();
+        // フッターをレイアウトファイルから生成
+        View footer = getLayoutInflater().inflate(R.layout.footer, null);
+        // フッターを追加
+        listView.addFooterView(footer, null, true);
+        
         m_r = getResources();
         facebook_main.init(this);
         facebook_main.loginOAuth();
@@ -217,8 +232,26 @@ public class NewsFeedActivity extends BaseActivity {
     // Starts PostDetailActivity.
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Post post = mFeed.get(position);
-        PostDetail(post);
+        //Object post = mFeed.get(position);
+        // クリックされたViewがフッターか判定
+        if (v.getId() == R.id.footer) {
+        	if(facebook_main.m_facebook==null)return;
+        	if(facebook_main.paging==null)return;
+        	try {
+				ResponseList<?> page = facebook_main.m_facebook.fetchNext(facebook_main.paging);
+				for (Object obj : page) {
+	                mAdapter.add(obj);
+	            }
+            	facebook_main.paging = page.getPaging(); //ページング情報セット
+			} catch (FacebookException e) {
+				Log.e(TAG, "",e);
+			}
+        	return;
+        }
+        
+    	if(mAdapter==null)return;
+    	Object post = mAdapter.getItem(position);
+        dispDetail(post);
 /*        
         Intent intent = new Intent(this, PostDetailActivity.class);
         intent.putExtra("FROM", post.getFrom().getName());
@@ -228,7 +261,7 @@ public class NewsFeedActivity extends BaseActivity {
     }
     
 	private Dialog mDialog = null;
-	protected void PostDetail(Post post){
+	protected void dispDetail(Object obj){
 		if(mDialog!=null){
 			try{
 				mDialog.dismiss();
@@ -241,7 +274,6 @@ public class NewsFeedActivity extends BaseActivity {
 		
 		mDialog.setContentView(R.layout.post_detail);
 
-		mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON,R.drawable.icon);
 
 		mDialog.setOnKeyListener(new OnKeyListener() {
 			@Override
@@ -266,10 +298,38 @@ public class NewsFeedActivity extends BaseActivity {
 //		TextView mFrom = (TextView) mDialog.findViewById(R.id.post_detail_from);
         TextView mMessage = (TextView) mDialog.findViewById(R.id.post_detail_message);
         String title="";
-		if(post!=null){
+    	Reading rd = new Reading().fields("picture");
+
+		if(obj!=null){
 //	        mFrom.setText(post.getFrom().getName());
-			title = post.getFrom().getName();
-	        mMessage.setText(post.getMessage());
+			switch(facebook_main.FEED_MODE){
+				case facebook_main.GET_HOME:
+				case facebook_main.SEACH_POSTS:
+					Post post = (Post)obj;
+					title = post.getFrom().getName();
+			        mMessage.setText(post.getMessage());
+					try {
+						User user = facebook_main.m_facebook.getUser(post.getFrom().getId(), rd);
+						URL url = user.getPicture()==null? null : user.getPicture().getURL();
+				        if(url==null)break;
+						AsyncHttpClient client = new AsyncHttpClient();
+						client.get(url.toString(),
+							new BinaryHttpResponseHandler() {
+						    @Override
+						    public void onSuccess(byte[] fileData) {
+						    	Bitmap m_bmp = BitmapFactory.decodeByteArray(fileData, 0, fileData.length);
+								mDialog.setFeatureDrawable(Window.FEATURE_LEFT_ICON,new BitmapDrawable(m_bmp));
+						    }
+						});
+					} catch (FacebookException e1) {
+						Log.e(TAG, "",e1);
+					}
+					break;
+				default:
+					title="Failture";
+			        mMessage.setText("Can't Get PostData");
+					break;
+			}
 		}
 		else{
 //	        mFrom.setText("Failture");
@@ -376,7 +436,8 @@ public class NewsFeedActivity extends BaseActivity {
     }
     
     private void getFeed() {
-        mFeed = new ArrayList<Post>();
+        facebook_main.FEED_MODE =facebook_main.GET_HOME;
+        mFeed = new ArrayList<Object>();
         mAdapter = new NewsFeedAdapter(this, mFeed);
         NewsFeedReaderTask task = new NewsFeedReaderTask(this, mAdapter);
         task.execute();
@@ -385,7 +446,7 @@ public class NewsFeedActivity extends BaseActivity {
 //=====================================================================================
 
     private void getSearch(int search_mode,String word) {
-        mFeed = new ArrayList<Post>();
+        mFeed = new ArrayList<Object>();
         mAdapter = new NewsFeedAdapter(this, mFeed);
         NewsSearchTask task = new NewsSearchTask(this, mAdapter,search_mode);
         task.execute(word);
