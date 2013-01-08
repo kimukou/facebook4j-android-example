@@ -16,8 +16,11 @@
 
 package facebook4j.examples.android.adapter;
 
+import java.io.File;
+
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import facebook4j.Media;
 import facebook4j.examples.android.NewsFeedActivity;
 import facebook4j.examples.android.sns.facebook_main;
 
@@ -56,6 +59,18 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     	            ret = facebook_main.m_facebook.postStatusMessage(word);
     				break;
     			case facebook_main.POST_PHOTE:
+        			String dst = new StringBuilder("/data/data/").append(mActivity.getPackageName()).append("/dst.txt").toString();
+        			File mfile = new File(dst);
+        			if(!mfile.exists()){
+        	            ret = facebook_main.m_facebook.postStatusMessage(word);
+        				break;
+        			}
+    				Media source = new Media(mfile);
+    				ret = facebook_main.m_facebook.postPhoto(source,
+    						word,
+    		                "",
+    		                false);//trueだとpostされない
+    				mfile.delete();
     				break;
     			case facebook_main.POST_FEED:
     				break;

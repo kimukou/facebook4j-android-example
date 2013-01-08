@@ -16,6 +16,12 @@
 
 package facebook4j.examples.android;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +30,13 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -41,6 +50,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -98,6 +108,16 @@ public class NewsFeedActivity extends BaseActivity {
         }
     }
 
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
+
 	
     public void onClickSearch(View v){
         choiceDlgShow(R.layout.spinner_search,R.id.spinner_search,v);
@@ -135,6 +155,8 @@ public class NewsFeedActivity extends BaseActivity {
     	   switch(spinner_id){
 	   			case R.id.spinner_post:
 	   				choiceDlg.setTitle("postmode");
+	   				TextView mTitle = (TextView) choiceDlg.findViewById(R.id.TxtTitle);
+	   				mTitle.setText("");
 	   				break;
 	   			case R.id.spinner_search:
 	   				choiceDlg.setTitle("searchmode");
@@ -199,6 +221,45 @@ public class NewsFeedActivity extends BaseActivity {
     	   switch(spinner_id){
 	   			case R.id.spinner_post:
 	   				spinner.setSelection(selected_pos);
+	   				
+	   		       choiceDlg.findViewById(R.id.ChoiceImage).setOnClickListener(
+	   	    			new OnClickListener() {
+	   	    				public void onClick(final View v) {
+	   	    			        Intent intent = new Intent(Intent.ACTION_PICK);
+	   	    			        intent.setType("image/*");
+	   	    			    	startActivityForCallback(intent, new OnActivityResultCallback() {
+	   	    			            // ここで値を受け取れる
+	   	    			            public void onResult(int resultCode, Intent data) {
+	   	    			                if (resultCode == RESULT_OK){
+	   	    			                    // 選択された画像のUriを取得
+	   	    			                    Uri uri = data.getData();
+	   	    			                    // 画像を縮小して取得
+	   	    			                    ImageButton mImgbtn = (ImageButton)v;
+	   	    			                    Bitmap bitmap = decodeUri(uri, mImgbtn.getWidth());
+	   	    			                    // ImageViewにセット
+	   	    			                    mImgbtn.setImageBitmap(bitmap);
+	   	    			                    
+	   	    			            		File newfile = null;
+	   	    			            		try {
+	   	    			            			ByteArrayOutputStream jpg = new ByteArrayOutputStream();
+	   	    			            			bitmap.compress(CompressFormat.JPEG, 100, jpg);
+	   	    			            			String dst = new StringBuilder("/data/data/").append(getPackageName()).append("/dst.txt").toString();
+	   	    			            			newfile = new File(dst);
+	   	    			            		    newfile.createNewFile();
+	   	    			            		    
+	   	    			            		    FileOutputStream fo = new FileOutputStream(newfile);
+	   	    			            		    fo.write(jpg.toByteArray());
+	   	    			            		    fo.close();
+	   	    			            		} catch (IOException e) {
+	   	    			            			Log.e(TAG, "IOException ",e); 
+	   	    			            		}
+
+	   	    			                }
+	   	    			            }
+	   	    			    	});
+	   	    				}
+	   	    			}
+	   		    	);
    	   				break;
     	   }
 
@@ -212,6 +273,17 @@ public class NewsFeedActivity extends BaseActivity {
 	                String item = (String) spinner.getSelectedItem();
 	                selected_str = item;
 	                selected_pos = position;
+	         	   switch(spinner_id){
+		   				case R.id.spinner_post:
+		   					ImageButton mImgbtn = (ImageButton) choiceDlg.findViewById(R.id.ChoiceImage);
+		   					if(selected_pos==facebook_main.POST_PHOTE){
+		   						mImgbtn.setVisibility(View.VISIBLE);
+		   					}
+		   					else{
+		   						mImgbtn.setVisibility(View.GONE);
+		   					}
+		   				break;
+	         	   }
 	            }
 	            @Override
 	            public void onNothingSelected(AdapterView<?> arg0) {
@@ -228,6 +300,66 @@ public class NewsFeedActivity extends BaseActivity {
 	       choiceDlg.show();
 	}
     
+	
+    /**
+     * Uriから指定されたサイズを下回らない最小のサイズのBitmapを生成します。
+     * inSampleSizeが整数でしか倍率を指定できないのでぴったりにはなりません。
+     * 
+     * @param uri 画像のUri
+     * @param width 縮小後のサイズ（ぴったりにはならない）
+     * @return Bitmap画像
+     */
+    private Bitmap decodeUri(Uri uri, int width) {
+        try {
+            // 縮小する倍率を計算する
+            int sampleSize = calcSampleSize(uri, width);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            // 縮小する倍率をセット
+            options.inSampleSize = sampleSize;
+
+            InputStream is = getContentResolver().openInputStream(uri);
+            // Bitmapを生成！
+            Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+            is.close();
+            return bitmap;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 縮小する倍率を計算します。 具体的には、指定されたサイズを下回らない最小のサイズになるような倍率を計算します。
+     * 
+     * @param uri 画像のUri
+     * @param size 縮小後のサイズ
+     * @return 縮小する倍率
+     */
+    private int calcSampleSize(Uri uri, int size) {
+        int sampleSize = 1;
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            // Bitmapは生成せずに画像のサイズを測るだけの設定
+            options.inJustDecodeBounds = true;
+            // 測定！
+            BitmapFactory.decodeStream(is, null, options);
+            is.close();
+
+            // 画像サイズを指定されたサイズで割る
+            // int同士の除算なので自動的に小数点以下は切り捨てられる
+            sampleSize = options.outWidth / size;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sampleSize;
+    }
 
     // Starts PostDetailActivity.
     @Override
