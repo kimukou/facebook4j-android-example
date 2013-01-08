@@ -32,10 +32,12 @@ import com.loopj.android.image.SmartImageView;
 
 import facebook4j.Checkin;
 import facebook4j.Event;
+import facebook4j.FacebookException;
 import facebook4j.Group;
 import facebook4j.Location;
 import facebook4j.Place;
 import facebook4j.Post;
+import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.examples.android.R;
 import facebook4j.examples.android.sns.facebook_main;
@@ -58,6 +60,7 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
     }
     
 	static class ViewHolder {  
+		SmartImageView mIcon;
 	    TextView mFrom;  
 		TextView mMessage;
 		SmartImageView mImage;
@@ -69,6 +72,7 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
 
 		ViewHolder holder;
 		View rowView = convertView;
+	    SmartImageView mIcon = null;
 	    TextView mFrom = null;
 	    TextView mMessage = null;
 	    SmartImageView mImage = null;
@@ -81,10 +85,15 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
 			}
             holder = new ViewHolder();
             LinearLayout ln = (LinearLayout)rowView;
-            mFrom= (TextView)ln.getChildAt(0);
+            
+            LinearLayout ln2 = (LinearLayout)ln.getChildAt(0);
+            mIcon= (SmartImageView)ln2.getChildAt(0);
+            mFrom= (TextView)ln2.getChildAt(1);
+            
             mMessage= (TextView)ln.getChildAt(1);
             mImage= (SmartImageView)ln.getChildAt(2);
             
+            holder.mIcon = mIcon;
             holder.mFrom = mFrom;
             holder.mMessage = mMessage;
             holder.mImage = mImage;
@@ -92,6 +101,7 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
         }
         else{
             holder = (ViewHolder) rowView.getTag();
+            mIcon = holder.mIcon;
             mFrom = holder.mFrom;
             mMessage = holder.mMessage;
             mImage = holder.mImage;
@@ -112,6 +122,14 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
     	            else{
     	            	mImage.setVisibility(View.GONE);
     	            }
+    	            Reading rd = new Reading().fields("picture");
+					try {
+						User user = facebook_main.m_facebook.getUser(post.getFrom().getId(), rd);
+						URL url_icon = user.getPicture()==null? null : user.getPicture().getURL();
+	    	            mIcon.setImageUrl(url_icon.toString());
+					} catch (FacebookException e) {
+						
+					}
     	        }
     			break;
     		case facebook_main.SEACH_USERS:
