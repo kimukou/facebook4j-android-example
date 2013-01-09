@@ -17,11 +17,16 @@
 package facebook4j.examples.android.adapter;
 
 import java.io.File;
+import java.net.URL;
 
 import android.app.ProgressDialog;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import facebook4j.Media;
+import facebook4j.Photo;
+import facebook4j.PostUpdate;
 import facebook4j.examples.android.NewsFeedActivity;
+import facebook4j.examples.android.R;
 import facebook4j.examples.android.sns.facebook_main;
 
 /**
@@ -32,6 +37,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     //private Facebook mFacebook;
     private NewsFeedActivity mActivity;
     private ProgressDialog mProgressDialog;
+    private Resources m_r;
     private int post_mode;
     //private Throwable t = null;
 
@@ -39,6 +45,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
         //mFacebook = facebook;
         mActivity = activity;
         post_mode = post_mode_;
+        m_r = mActivity.getResources();
     }
 
     @Override
@@ -66,11 +73,17 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
         				break;
         			}
     				Media source = new Media(mfile);
-    				ret = facebook_main.m_facebook.postPhoto(source,
-    						word,
-    		                "",
-    		                false);//trueだとpostされない
+    				String photoId = facebook_main.m_facebook.postPhoto(source);
+//    				String photoId = facebook_main.m_facebook.postPhoto(source,
+//    						word,
+//    		                "",
+//    		                false);//trueだとHomeタイムライン等で非表示
     				mfile.delete();
+    				Photo photo = facebook_main.m_facebook.getPhoto(photoId);
+    				PostUpdate post =  new PostUpdate(new URL(m_r.getString(R.string.fb_login_url)))
+    								   .picture(photo.getPicture())
+    								   .message(word);
+    				facebook_main.m_facebook.postFeed(post);
     				break;
     			case facebook_main.POST_FEED:
     				break;
