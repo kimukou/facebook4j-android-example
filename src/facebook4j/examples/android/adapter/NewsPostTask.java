@@ -59,8 +59,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     	            ret = facebook_main.m_facebook.postStatusMessage(word);
     				break;
     			case facebook_main.POST_PHOTE:
-        			String dst = new StringBuilder("/data/data/").append(mActivity.getPackageName()).append("/dst.txt").toString();
-        			File mfile = new File(dst);
+        			File mfile = new File(mActivity.getCacheDir(), "dst.txt");
         			if(!mfile.exists()){
         	            ret = facebook_main.m_facebook.postStatusMessage(word);
         				break;

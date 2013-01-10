@@ -230,31 +230,28 @@ public class NewsFeedActivity extends BaseActivity {
 	   	    			    	startActivityForCallback(intent, new OnActivityResultCallback() {
 	   	    			            // ここで値を受け取れる
 	   	    			            public void onResult(int resultCode, Intent data) {
-	   	    			                if (resultCode == RESULT_OK){
-	   	    			                    // 選択された画像のUriを取得
-	   	    			                    Uri uri = data.getData();
-	   	    			                    // 画像を縮小して取得
-	   	    			                    ImageButton mImgbtn = (ImageButton)v;
-	   	    			                    Bitmap bitmap = decodeUri(uri, mImgbtn.getWidth());
-	   	    			                    // ImageViewにセット
-	   	    			                    mImgbtn.setImageBitmap(bitmap);
-	   	    			                    
-	   	    			            		File newfile = null;
-	   	    			            		try {
-	   	    			            			ByteArrayOutputStream jpg = new ByteArrayOutputStream();
-	   	    			            			bitmap.compress(CompressFormat.JPEG, 100, jpg);
-	   	    			            			String dst = new StringBuilder("/data/data/").append(getPackageName()).append("/dst.txt").toString();
-	   	    			            			newfile = new File(dst);
-	   	    			            		    newfile.createNewFile();
-	   	    			            		    
-	   	    			            		    FileOutputStream fo = new FileOutputStream(newfile);
-	   	    			            		    fo.write(jpg.toByteArray());
-	   	    			            		    fo.close();
-	   	    			            		} catch (IOException e) {
-	   	    			            			Log.e(TAG, "IOException ",e); 
-	   	    			            		}
-
-	   	    			                }
+	   	    			                if (resultCode != RESULT_OK)return;
+   	    			                    // 選択された画像のUriを取得
+   	    			                    Uri uri = data.getData();
+   	    			                    // 画像を縮小して取得
+   	    			                    ImageButton mImgbtn = (ImageButton)v;
+   	    			                    Bitmap bitmap = decodeUri(uri, mImgbtn.getWidth());
+   	    			                    // ImageViewにセット
+   	    			                    mImgbtn.setImageBitmap(bitmap);
+   	    			                    
+   	    			            		File newfile = null;
+   	    			            		try {
+   	    			            			ByteArrayOutputStream jpg = new ByteArrayOutputStream();
+   	    			            			bitmap.compress(CompressFormat.JPEG, 100, jpg);
+   	    			            			newfile = new File(getCacheDir(), "dst.txt");
+   	    			            		    newfile.createNewFile();
+   	    			            		    
+   	    			            		    FileOutputStream fo = new FileOutputStream(newfile);
+   	    			            		    fo.write(jpg.toByteArray());
+   	    			            		    fo.close();
+   	    			            		} catch (IOException e) {
+   	    			            			Log.e(TAG, "IOException ",e); 
+   	    			            		}
 	   	    			            }
 	   	    			    	});
 	   	    				}
