@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android.sns;
+package facebook4j.examples.sns;
 
 import android.app.Activity;
 import android.content.Intent;

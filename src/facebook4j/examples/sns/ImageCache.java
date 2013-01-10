@@ -1,4 +1,4 @@
-package facebook4j.examples.android.sns;
+package facebook4j.examples.sns;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

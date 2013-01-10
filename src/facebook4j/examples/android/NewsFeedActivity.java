@@ -62,15 +62,15 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.User;
-import facebook4j.examples.android.adapter.NewsFeedAdapter;
-import facebook4j.examples.android.adapter.NewsFeedReaderTask;
-import facebook4j.examples.android.adapter.NewsPostTask;
-import facebook4j.examples.android.adapter.NewsSearchTask;
-import facebook4j.examples.android.android_super.BaseActivity;
-import facebook4j.examples.android.android_super.OnActivityResultCallback;
-import facebook4j.examples.android.sns.AuthFbActivity;
-import facebook4j.examples.android.sns.ImageCache;
-import facebook4j.examples.android.sns.facebook_main;
+import facebook4j.examples.adapter.NewsFeedAdapter;
+import facebook4j.examples.adapter.NewsFeedReaderTask;
+import facebook4j.examples.adapter.NewsPostTask;
+import facebook4j.examples.adapter.NewsSearchTask;
+import facebook4j.examples.android_super.BaseActivity;
+import facebook4j.examples.android_super.OnActivityResultCallback;
+import facebook4j.examples.sns.AuthFbActivity;
+import facebook4j.examples.sns.ImageCache;
+import facebook4j.examples.sns.facebook_main;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
@@ -94,6 +94,8 @@ public class NewsFeedActivity extends BaseActivity {
         View footer = getLayoutInflater().inflate(R.layout.footer, null);
         // フッターを追加
         listView.addFooterView(footer, null, true);
+        
+        mAdapter = new NewsFeedAdapter(this);
         
         m_r = getResources();
         facebook_main.init(this);
@@ -574,7 +576,7 @@ public class NewsFeedActivity extends BaseActivity {
     private void getFeed() {
         facebook_main.FEED_MODE =facebook_main.GET_HOME;
         //mFeed = new ArrayList<Object>();
-        mAdapter = new NewsFeedAdapter(this);//, mFeed);
+        //mAdapter = new NewsFeedAdapter(this);//, mFeed);
         NewsFeedReaderTask task = new NewsFeedReaderTask(this, mAdapter);
         task.execute();
     }
@@ -583,7 +585,7 @@ public class NewsFeedActivity extends BaseActivity {
 
     private void getSearch(int search_mode,String word) {
         //mFeed = new ArrayList<Object>();
-        mAdapter = new NewsFeedAdapter(this);//, mFeed);
+        //mAdapter = new NewsFeedAdapter(this);//, mFeed);
         NewsSearchTask task = new NewsSearchTask(this, mAdapter,search_mode);
         task.execute(word);
     }

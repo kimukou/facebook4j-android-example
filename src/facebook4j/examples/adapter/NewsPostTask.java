@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android.adapter;
+package facebook4j.examples.adapter;
 
 import java.io.File;
 import java.net.URL;
@@ -28,7 +28,8 @@ import facebook4j.PostUpdate;
 import facebook4j.Reading;
 import facebook4j.examples.android.NewsFeedActivity;
 import facebook4j.examples.android.R;
-import facebook4j.examples.android.sns.facebook_main;
+import facebook4j.examples.sns.facebook_main;
+import facebook4j.examples.util.ShortURL;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
@@ -42,7 +43,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     private int post_mode;
     //private Throwable t = null;
     public NewsFeedAdapter mAdapter;
-
+    
     public NewsPostTask(NewsFeedActivity activity,int post_mode_) {
         //mFacebook = facebook;
         mActivity = activity;
@@ -86,7 +87,8 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
 	                true);//trueだとHomeタイムライン等で非表示
     				mfile.delete();
     				Photo photo = facebook_main.m_facebook.getPhoto(photoId);
-    				PostUpdate post =  new PostUpdate(new URL(m_r.getString(R.string.fb_login_url)))
+    				URL exURL =  ShortURL.expand(new URL(m_r.getString(R.string.fb_login_url)));
+    				PostUpdate post =  new PostUpdate(exURL)
     								   .picture(photo.getPicture())
     								   .message(word);
     				ret = facebook_main.m_facebook.postFeed(post);

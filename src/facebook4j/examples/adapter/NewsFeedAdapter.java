@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android.adapter;
+package facebook4j.examples.adapter;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.examples.android.R;
-import facebook4j.examples.android.sns.ImageCache;
-import facebook4j.examples.android.sns.facebook_main;
+import facebook4j.examples.sns.ImageCache;
+import facebook4j.examples.sns.facebook_main;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
@@ -75,12 +75,6 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
 		items.addAll(objects);
     }
     
-	static class ViewHolder {  
-		SmartImageView mIcon;
-	    TextView mFrom;  
-		TextView mMessage;
-		SmartImageView mImage;
-	}  
 
 	@Override
 	public void add(Object object) {
@@ -93,6 +87,13 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
 		super.insert(object, index);
 		items.add(index, object);
 	}
+
+	static class ViewHolder {  
+		SmartImageView mIcon;
+	    TextView mFrom;  
+		TextView mMessage;
+		SmartImageView mImage;
+	}  
 
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {

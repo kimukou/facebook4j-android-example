@@ -1,4 +1,4 @@
-package facebook4j.examples.android.android_super;
+package facebook4j.examples.android_super;
 
 import android.app.Application;
 import android.util.SparseArray;

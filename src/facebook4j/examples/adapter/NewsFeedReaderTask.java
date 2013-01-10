@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package facebook4j.examples.android.adapter;
+package facebook4j.examples.adapter;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -22,7 +22,7 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.examples.android.NewsFeedActivity;
-import facebook4j.examples.android.sns.facebook_main;
+import facebook4j.examples.sns.facebook_main;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
