@@ -17,10 +17,13 @@
 package facebook4j.examples.android.adapter;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.loopj.android.image.SmartImageView;
 
 import facebook4j.Checkin;
@@ -40,6 +45,7 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.examples.android.R;
+import facebook4j.examples.android.sns.ImageCache;
 import facebook4j.examples.android.sns.facebook_main;
 
 /**
@@ -49,14 +55,24 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
     private LayoutInflater mInflater;
     private int layoutId;
 	private View layView = null;
+	private List<Object> items =new ArrayList<Object>();
 
-	
-    //public NewsFeedAdapter(Context context, List<Post> objects) {
+    public NewsFeedAdapter(Activity context) {
+        super(context, 0);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        layoutId = R.layout.feed_row;
+		layView = context.getLayoutInflater().inflate(layoutId, null);
+		items.clear();
+    }
+
+	//public NewsFeedAdapter(Context context, List<Post> objects) {
     public NewsFeedAdapter(Activity context, List<Object> objects) {
         super(context, 0, objects);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         layoutId = R.layout.feed_row;
 		layView = context.getLayoutInflater().inflate(layoutId, null);
+		items.clear();
+		items.addAll(objects);
     }
     
 	static class ViewHolder {  
@@ -66,16 +82,27 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
 		SmartImageView mImage;
 	}  
 
+	@Override
+	public void add(Object object) {
+		super.add(object);
+		items.add(object);
+	}
 
     @Override
+	public void insert(Object object, int index) {
+		super.insert(object, index);
+		items.add(index, object);
+	}
+
+	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
 		ViewHolder holder;
 		View rowView = convertView;
-	    SmartImageView mIcon = null;
-	    TextView mFrom = null;
-	    TextView mMessage = null;
-	    SmartImageView mImage = null;
+	    final SmartImageView mIcon ;
+	    final TextView mFrom;
+	    final TextView mMessage;
+	    final SmartImageView mImage;
 
         if (rowView == null) {
         	try {
@@ -122,14 +149,29 @@ public class NewsFeedAdapter extends ArrayAdapter<Object> {
     	            else{
     	            	mImage.setVisibility(View.GONE);
     	            }
-    	            Reading rd = new Reading().fields("picture");
-					try {
-						User user = facebook_main.m_facebook.getUser(post.getFrom().getId(), rd);
-						URL url_icon = user.getPicture()==null? null : user.getPicture().getURL();
-	    	            mIcon.setImageUrl(url_icon.toString());
-					} catch (FacebookException e) {
-						
-					}
+    	            
+			        String id = post.getFrom().getId();
+			        final String fid = "icon_" + id;
+        			if(ImageCache.get(fid)==null){
+    					try {
+    						User user = facebook_main.m_facebook.getUser(id, new Reading().fields("picture"));
+    						URL url_icon = user.getPicture()==null? null : user.getPicture().getURL();
+    						AsyncHttpClient client = new AsyncHttpClient();
+    						client.get(url_icon.toString(),
+    							new BinaryHttpResponseHandler() {
+    						    @Override
+    						    public void onSuccess(byte[] fileData) {
+    						    	Bitmap m_bmp = BitmapFactory.decodeByteArray(fileData, 0, fileData.length);
+    						    	mIcon.setImageBitmap(m_bmp);
+    								ImageCache.put(fid,m_bmp);
+    						    }
+    						});
+    					} catch (FacebookException e) {
+    					}
+        			}
+        			else{
+				    	mIcon.setImageBitmap(ImageCache.get(fid));
+        			}
     	        }
     			break;
     		case facebook_main.SEACH_USERS:

@@ -23,8 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -71,6 +69,7 @@ import facebook4j.examples.android.adapter.NewsSearchTask;
 import facebook4j.examples.android.android_super.BaseActivity;
 import facebook4j.examples.android.android_super.OnActivityResultCallback;
 import facebook4j.examples.android.sns.AuthFbActivity;
+import facebook4j.examples.android.sns.ImageCache;
 import facebook4j.examples.android.sns.facebook_main;
 
 /**
@@ -79,8 +78,8 @@ import facebook4j.examples.android.sns.facebook_main;
 public class NewsFeedActivity extends BaseActivity {
 
 	private final String TAG = getClass().getSimpleName();
-    private List<Object> mFeed;
-    private NewsFeedAdapter mAdapter;
+    //private List<Object> mFeed;
+    public NewsFeedAdapter mAdapter;
     private Resources m_r;
     
     @Override
@@ -437,22 +436,30 @@ public class NewsFeedActivity extends BaseActivity {
 					Post post = (Post)obj;
 					title = post.getFrom().getName();
 			        mMessage.setText(post.getMessage());
-					try {
-						User user = facebook_main.m_facebook.getUser(post.getFrom().getId(), rd);
-						URL url = user.getPicture()==null? null : user.getPicture().getURL();
-				        if(url==null)break;
-						AsyncHttpClient client = new AsyncHttpClient();
-						client.get(url.toString(),
-							new BinaryHttpResponseHandler() {
-						    @Override
-						    public void onSuccess(byte[] fileData) {
-						    	Bitmap m_bmp = BitmapFactory.decodeByteArray(fileData, 0, fileData.length);
-								mDialog.setFeatureDrawable(Window.FEATURE_LEFT_ICON,new BitmapDrawable(m_bmp));
-						    }
-						});
-					} catch (FacebookException e1) {
-						Log.e(TAG, "",e1);
-					}
+			        String id = post.getFrom().getId();
+			        final String fid = "icon_" + id;
+        			if(ImageCache.get(fid)==null){
+    					try {
+    						User user = facebook_main.m_facebook.getUser(post.getFrom().getId(), rd);
+    						URL url = user.getPicture()==null? null : user.getPicture().getURL();
+    				        if(url==null)break;
+    						AsyncHttpClient client = new AsyncHttpClient();
+    						client.get(url.toString(),
+    							new BinaryHttpResponseHandler() {
+    						    @Override
+    						    public void onSuccess(byte[] fileData) {
+    						    	Bitmap m_bmp = BitmapFactory.decodeByteArray(fileData, 0, fileData.length);
+    								mDialog.setFeatureDrawable(Window.FEATURE_LEFT_ICON,new BitmapDrawable(m_bmp));
+    								ImageCache.put(fid,m_bmp);
+    						    }
+    						});
+    					} catch (FacebookException e1) {
+    						Log.e(TAG, "",e1);
+    					}
+        			}
+        			else{
+        				mDialog.setFeatureDrawable(Window.FEATURE_LEFT_ICON,new BitmapDrawable(ImageCache.get(fid)));
+        			}
 					break;
 				default:
 					title="Failture";
@@ -566,8 +573,8 @@ public class NewsFeedActivity extends BaseActivity {
     
     private void getFeed() {
         facebook_main.FEED_MODE =facebook_main.GET_HOME;
-        mFeed = new ArrayList<Object>();
-        mAdapter = new NewsFeedAdapter(this, mFeed);
+        //mFeed = new ArrayList<Object>();
+        mAdapter = new NewsFeedAdapter(this);//, mFeed);
         NewsFeedReaderTask task = new NewsFeedReaderTask(this, mAdapter);
         task.execute();
     }
@@ -575,8 +582,8 @@ public class NewsFeedActivity extends BaseActivity {
 //=====================================================================================
 
     private void getSearch(int search_mode,String word) {
-        mFeed = new ArrayList<Object>();
-        mAdapter = new NewsFeedAdapter(this, mFeed);
+        //mFeed = new ArrayList<Object>();
+        mAdapter = new NewsFeedAdapter(this);//, mFeed);
         NewsSearchTask task = new NewsSearchTask(this, mAdapter,search_mode);
         task.execute(word);
     }

@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import facebook4j.Media;
 import facebook4j.Photo;
 import facebook4j.PostUpdate;
+import facebook4j.Reading;
 import facebook4j.examples.android.NewsFeedActivity;
 import facebook4j.examples.android.R;
 import facebook4j.examples.android.sns.facebook_main;
@@ -40,10 +41,12 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     private Resources m_r;
     private int post_mode;
     //private Throwable t = null;
+    public NewsFeedAdapter mAdapter;
 
     public NewsPostTask(NewsFeedActivity activity,int post_mode_) {
         //mFacebook = facebook;
         mActivity = activity;
+        mAdapter = mActivity.mAdapter;
         post_mode = post_mode_;
         m_r = mActivity.getResources();
     }
@@ -72,22 +75,27 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
         				break;
         			}
     				Media source = new Media(mfile);
-    				String photoId = facebook_main.m_facebook.postPhoto(source);
+//    				String photoId = facebook_main.m_facebook.postPhoto(source);
 //    				String photoId = facebook_main.m_facebook.postPhoto(source,
 //    						word,
 //    		                "",
 //    		                false);//trueだとHomeタイムライン等で非表示
+    				String photoId = facebook_main.m_facebook.postPhoto(source,
+    				word,
+	                "",
+	                true);//trueだとHomeタイムライン等で非表示
     				mfile.delete();
     				Photo photo = facebook_main.m_facebook.getPhoto(photoId);
     				PostUpdate post =  new PostUpdate(new URL(m_r.getString(R.string.fb_login_url)))
     								   .picture(photo.getPicture())
     								   .message(word);
-    				facebook_main.m_facebook.postFeed(post);
+    				ret = facebook_main.m_facebook.postFeed(post);
     				break;
     			case facebook_main.POST_FEED:
     				break;
         	}
         } catch (Throwable t) {
+        	ret = null;
             //this.t = t;
         }
         return ret;
@@ -96,6 +104,26 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         mProgressDialog.dismiss();
+        if(result==null)return;
+        
+    	Reading rd = new Reading().fields(
+				"from", "message","message_tags","picture"
+			)
+			.limit(facebook_main.FEED_LIMIT);
+
+    	try{
+        	switch(post_mode){
+    			case facebook_main.POST_STATUS:
+    			case facebook_main.POST_PHOTE:
+    			case facebook_main.POST_FEED:
+    		        mAdapter.insert(facebook_main.m_facebook.getPost(result,rd),0);
+    				break;
+        	}
+    	}
+    	catch(Exception ex){
+    		
+    	}
+
 //        if (t != null) {
 //            mActivity.onError(t);
 //            return;

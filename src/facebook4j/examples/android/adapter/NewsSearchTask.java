@@ -33,7 +33,7 @@ import facebook4j.examples.android.sns.facebook_main;
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-public class NewsSearchTask extends AsyncTask<String, Void, NewsFeedAdapter> {
+public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 
     //private Facebook mFacebook;
     private NewsFeedActivity mActivity;
@@ -56,6 +56,15 @@ public class NewsSearchTask extends AsyncTask<String, Void, NewsFeedAdapter> {
         mProgressDialog.setMessage("Now Loading...");
         mProgressDialog.show();
     }
+    
+	@Override
+	protected void onProgressUpdate(Object... progress) {
+		for (Object bean_s : progress) {
+			mAdapter.add(bean_s);
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
 
     //see 	http://facebook4j.org/ja/code-examples.html
     //		field https://developers.facebook.com/docs/reference/api/post/
@@ -156,13 +165,18 @@ public class NewsSearchTask extends AsyncTask<String, Void, NewsFeedAdapter> {
     }
 
     @Override
+	protected void onCancelled(NewsFeedAdapter result) {
+        mProgressDialog.dismiss();
+    }
+
+    @Override
     protected void onPostExecute(NewsFeedAdapter result) {
         mProgressDialog.dismiss();
 //        if (t != null) {
 //            mActivity.onError(t);
 //            return;
 //        }
-        mActivity.setListAdapter(result);
+//        mActivity.setListAdapter(result);
     }
 
 }
