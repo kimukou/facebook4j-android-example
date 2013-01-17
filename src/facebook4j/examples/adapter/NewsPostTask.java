@@ -119,6 +119,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     			case facebook_main.POST_PHOTE:
     			case facebook_main.POST_FEED:
     		        mAdapter.insert(facebook_main.m_facebook.getPost(result,rd),0);
+    				mAdapter.notifyDataSetChanged();
     				break;
         	}
     	}

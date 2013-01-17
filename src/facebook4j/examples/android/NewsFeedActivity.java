@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -367,15 +369,29 @@ public class NewsFeedActivity extends BaseActivity {
         if (v.getId() == R.id.footer) {
         	if(facebook_main.m_facebook==null)return;
         	if(facebook_main.paging==null)return;
-        	try {
-				ResponseList<?> page = facebook_main.m_facebook.fetchNext(facebook_main.paging);
-				for (Object obj : page) {
-	                mAdapter.add(obj);
-	            }
-            	facebook_main.paging = page.getPaging(); //ページング情報セット
-			} catch (FacebookException e) {
-				Log.e(TAG, "",e);
-			}
+        	
+        	final ProgressDialog mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Next Reading...");
+            mProgressDialog.show();
+
+        	new Handler().post(new Runnable(){
+				@Override
+				public void run() {
+		        	try {
+						ResponseList<?> page = facebook_main.m_facebook.fetchNext(facebook_main.paging);
+						for (Object obj : page) {
+			                mAdapter.add(obj);
+			                mAdapter.notifyDataSetChanged();
+			            }
+		            	facebook_main.paging = page.getPaging(); //ページング情報セット
+					} catch (FacebookException e) {
+						Log.e(TAG, "",e);
+					}
+		        	finally{
+		        		mProgressDialog.dismiss();
+		        	}
+				}
+        	});
         	return;
         }
         

@@ -48,7 +48,7 @@ public class AuthFbTask extends AsyncTask<Object, Void, AuthFbWebView> {
         mOAuthWebView.setWebViewClient(new InternalWebViewClient());
         Facebook instance = new FacebookFactory().getInstance();
         mOAuthWebView.setFacebook(instance);
-        publishProgress();
+        publishProgress(); //onProgressUpdateを呼ぶ
         waitForAuthorization();
         if (mCode == null) {
             System.out.println("oauth code is null!!!!!!!!");

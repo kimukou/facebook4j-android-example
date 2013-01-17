@@ -47,6 +47,7 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
         //mFacebook = facebook;
         mActivity = activity;
         mAdapter = adapter;
+        mActivity.setListAdapter(mAdapter);
         search_mode = search_mode_;
     }
 
@@ -88,7 +89,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		,rd
 					);
 	                for (Post post : posts) {
-	                	mAdapter.add(post);
+	                	publishProgress(post);
+	                	//mAdapter.add(post);
 	                }
 	                facebook_main.paging = posts.getPaging(); //ページング情報セット
 	    			break;
@@ -98,7 +100,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		,rd
 					);
 	                for (User user : users) {
-	                	mAdapter.add(user);
+	                	publishProgress(user);
+	                	//mAdapter.add(user);
 	                }
 	                facebook_main.paging = users.getPaging(); //ページング情報セット
 	    			break;
@@ -110,7 +113,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		,rd
 					);
 	                for (Place place : places) {
-	                	mAdapter.add(place);
+	                	publishProgress(place);
+	                	//mAdapter.add(place);
 	                }
 	                facebook_main.paging = places.getPaging(); //ページング情報セット
 	    			break;
@@ -121,7 +125,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		,rd
 					);
 	                for (Location location : locations) {
-	                	mAdapter.add(location);
+	                	publishProgress(location);
+	                	//mAdapter.add(location);
 	                }
 	                facebook_main.paging = locations.getPaging(); //ページング情報セット
 	    			break;
@@ -131,7 +136,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		,rd
 					);
 	                for (Event event : events) {
-	                	mAdapter.add(event);
+	                	publishProgress(event);
+	                	//mAdapter.add(event);
 	                }
 	                facebook_main.paging = events.getPaging(); //ページング情報セット
 	    			break;
@@ -141,7 +147,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		rd
 					);
 	                for (Checkin checkin : checkins) {
-	                	mAdapter.add(checkin);
+	                	publishProgress(checkin);
+	                	//mAdapter.add(checkin);
 	                }
 	                facebook_main.paging = checkins.getPaging(); //ページング情報セット
 	    			break;
@@ -151,7 +158,8 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
 	                		rd
 					);
 	                for (Group group : groups) {
-	                	mAdapter.add(group);
+	                	publishProgress(group);
+	                	//mAdapter.add(group);
 	                }
 	                facebook_main.paging = groups.getPaging(); //ページング情報セット
 	    			break;

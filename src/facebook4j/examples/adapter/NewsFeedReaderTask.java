@@ -27,7 +27,7 @@ import facebook4j.examples.sns.facebook_main;
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
+public class NewsFeedReaderTask extends AsyncTask<Void, Post, NewsFeedAdapter> {
 
     //private Facebook mFacebook;
     private NewsFeedActivity mActivity;
@@ -40,6 +40,7 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
         //mFacebook = facebook;
         mActivity = activity;
         mAdapter = adapter;
+        mActivity.setListAdapter(mAdapter);
     }
 
     @Override
@@ -48,6 +49,15 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
         mProgressDialog.setMessage("Now Loading...");
         mProgressDialog.show();
     }
+    
+	@Override
+	protected void onProgressUpdate(Post... progress) {
+		for (Post bean_s : progress) {
+			mAdapter.add(bean_s);
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
     
     //see 	http://facebook4j.org/ja/code-examples.html
     //		field https://developers.facebook.com/docs/reference/api/post/
@@ -63,7 +73,8 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
             			rd
             		);
             for (Post post : feed) {
-                mAdapter.add(post);
+            	publishProgress(post);
+                //mAdapter.add(post);
             }
             facebook_main.paging = feed.getPaging(); //ページング情報セット
         } catch (Throwable t) {
@@ -81,7 +92,7 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Void, NewsFeedAdapter> {
 //            mActivity.onError(t);
 //            return;
 //        }
-        mActivity.setListAdapter(result);
+//        mActivity.setListAdapter(result);
     }
 
 }
