@@ -16,6 +16,8 @@
 
 package facebook4j.examples.adapter;
 
+import java.util.Calendar;
+
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import facebook4j.Post;
@@ -64,10 +66,16 @@ public class NewsFeedReaderTask extends AsyncTask<Void, Post, NewsFeedAdapter> {
     @Override
     protected NewsFeedAdapter doInBackground(Void... params) {
     	if(facebook_main.m_facebook==null)return null;
+    	
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.add(Calendar.DAY_OF_WEEK, -1);
+    	
     	Reading rd = new Reading().fields(
-				"from", "message","message_tags","picture"
+				"from", "message","message_tags","picture",
+				"link","name","caption","description",
+				"application","created_time","updated_time"
 			)
-			.limit(facebook_main.FEED_LIMIT);
+			.limit(facebook_main.FEED_LIMIT);//.since(calendar.getTime());
         try {
             ResponseList<Post> feed = facebook_main.m_facebook.getHome(
             			rd
