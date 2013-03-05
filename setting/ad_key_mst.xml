@@ -3,6 +3,21 @@
     <string name="fb_appId"></string>
     <string name="fb_appSecret"></string>
     <string name="fb_login_url">http://atnd.org/events/34079</string>
+<!-- 
     <string name="fb_permissions">email,publish_stream,read_stream</string>
-    
+ -->    
+    <string name="fb_permissions">
+    	offline_access,
+    	read_stream,
+    	publish_stream,
+    	manage_notifications,
+    	user_photos,
+    	friends_photos
+    	read_requests,
+    	read_mailbox
+    </string>
+ <!-- 
+    	read_frendlists,
+    	puplish_checkins
+  -->       
 </resources>

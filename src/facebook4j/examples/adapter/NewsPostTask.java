@@ -19,14 +19,15 @@ package facebook4j.examples.adapter;
 import java.io.File;
 import java.net.URL;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.widget.ArrayAdapter;
 import facebook4j.Media;
 import facebook4j.Photo;
 import facebook4j.PostUpdate;
 import facebook4j.Reading;
-import facebook4j.examples.android.NewsFeedActivity;
 import facebook4j.examples.android.R;
 import facebook4j.examples.sns.facebook_main;
 import facebook4j.examples.util.ShortURL;
@@ -37,17 +38,17 @@ import facebook4j.examples.util.ShortURL;
 public class NewsPostTask extends AsyncTask<String, Void, String> {
 
     //private Facebook mFacebook;
-    private NewsFeedActivity mActivity;
+    private Activity mActivity;
     private ProgressDialog mProgressDialog;
     private Resources m_r;
     private int post_mode;
     //private Throwable t = null;
-    public NewsFeedAdapter mAdapter;
+    public ArrayAdapter<Object> mAdapter;
     
-    public NewsPostTask(NewsFeedActivity activity,int post_mode_) {
+    public NewsPostTask(Activity activity,ArrayAdapter<Object> adapter,int post_mode_) {
         //mFacebook = facebook;
         mActivity = activity;
-        mAdapter = mActivity.mAdapter;
+        mAdapter = adapter;
         post_mode = post_mode_;
         m_r = mActivity.getResources();
     }
@@ -118,6 +119,7 @@ public class NewsPostTask extends AsyncTask<String, Void, String> {
     			case facebook_main.POST_STATUS:
     			case facebook_main.POST_PHOTE:
     			case facebook_main.POST_FEED:
+    				if(mAdapter==null)break;
     		        mAdapter.insert(facebook_main.m_facebook.getPost(result,rd),0);
     				mAdapter.notifyDataSetChanged();
     				break;

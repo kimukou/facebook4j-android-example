@@ -103,8 +103,9 @@ public class NewsFeedActivity extends BaseActivity {
         facebook_main.init(this);
         facebook_main.loginOAuth();
         if(facebook_main.isFacebookLogin()){
-        	getProfile();
-            getFeed();
+        	if(getProfile()){
+                getFeed();
+        	}
         }
         else{
         	startOAuth();
@@ -581,8 +582,9 @@ public class NewsFeedActivity extends BaseActivity {
             public void onResult(int resultCode, Intent data) {
             	final int state = data==null ? 0:data.getIntExtra("State",0);
             	if(state==1){
-                	getProfile();
-                    getFeed();
+                	if(getProfile()){
+                        getFeed();
+                	}
             	}
             }
     	});
@@ -619,7 +621,7 @@ public class NewsFeedActivity extends BaseActivity {
     		case facebook_main.POST_FEED:
     			break;
     	}
-        NewsPostTask task = new NewsPostTask(this, post_mode);
+        NewsPostTask task = new NewsPostTask(this, mAdapter,post_mode);
         task.execute(word);
     }
     
@@ -641,7 +643,7 @@ public class NewsFeedActivity extends BaseActivity {
 
 	
     //see http://facebook4j.org/en/javadoc/facebook4j/api/UserMethods.html#getUser(java.lang.String)
-	private void getProfile() {
+	private boolean getProfile() {
 		try {
 			User user = facebook_main.m_facebook.getMe(new Reading().fields("picture","name"));
 			//User user = facebook_main.m_facebook.getUser(facebook_main.m_facebook.getId()); //△(pictureが取れない)
@@ -655,10 +657,15 @@ public class NewsFeedActivity extends BaseActivity {
 			tx.setText(user.getName());
 		} catch (FacebookException e) {
 			Log.e(TAG, "getProfile",e);
-			e.printStackTrace();
+			//e.printStackTrace();
+			if("OAuthException".equals(e.getErrorType())){
+				startOAuth();
+			}
+			return false;
 		}
 		Button btn = _findViewById(R.id.button_login);
 		btn.setText(m_r.getString(R.string.sts_logout));
+		return true;
 	}
 
 }

@@ -16,8 +16,11 @@
 
 package facebook4j.examples.adapter;
 
+import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.widget.ArrayAdapter;
 import facebook4j.Checkin;
 import facebook4j.Event;
 import facebook4j.Group;
@@ -27,27 +30,28 @@ import facebook4j.Post;
 import facebook4j.Reading;
 import facebook4j.ResponseList;
 import facebook4j.User;
-import facebook4j.examples.android.NewsFeedActivity;
 import facebook4j.examples.sns.facebook_main;
 
 /**
  * @author Ryuji Yamashita - roundrop at gmail.com
  */
-public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
+public class NewsSearchTask extends AsyncTask<String, Object, ArrayAdapter<Object>> {
 
     //private Facebook mFacebook;
-    private NewsFeedActivity mActivity;
-    private NewsFeedAdapter mAdapter;
+    private Activity mActivity;
+    private ArrayAdapter<Object> mAdapter;
     private ProgressDialog mProgressDialog;
     private int search_mode;
     //private Throwable t = null;
 
     //public NewsFeedReaderTask(Facebook facebook, NewsFeedActivity activity, NewsFeedAdapter adapter) {
-    public NewsSearchTask(NewsFeedActivity activity, NewsFeedAdapter adapter,int search_mode_) {
+    public NewsSearchTask(Activity activity, ArrayAdapter<Object> adapter,int search_mode_) {
         //mFacebook = facebook;
         mActivity = activity;
         mAdapter = adapter;
-        mActivity.setListAdapter(mAdapter);
+        if(activity instanceof ListActivity){
+            ((ListActivity)mActivity).setListAdapter(mAdapter);
+        }
         search_mode = search_mode_;
     }
 
@@ -71,7 +75,7 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
     //see 	http://facebook4j.org/ja/code-examples.html
     //		field https://developers.facebook.com/docs/reference/api/post/
     @Override
-    protected NewsFeedAdapter doInBackground(String... params) {
+    protected ArrayAdapter<Object> doInBackground(String... params) {
     	if(facebook_main.m_facebook==null)return null;
     	String word = params[0];
     	Reading rd = new Reading().fields(
@@ -174,12 +178,12 @@ public class NewsSearchTask extends AsyncTask<String, Object, NewsFeedAdapter> {
     }
 
     @Override
-	protected void onCancelled(NewsFeedAdapter result) {
+	protected void onCancelled(ArrayAdapter<Object> result) {
         mProgressDialog.dismiss();
     }
 
     @Override
-    protected void onPostExecute(NewsFeedAdapter result) {
+    protected void onPostExecute(ArrayAdapter<Object> result) {
         mProgressDialog.dismiss();
 //        if (t != null) {
 //            mActivity.onError(t);
