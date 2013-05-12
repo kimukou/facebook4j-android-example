@@ -12,7 +12,7 @@
     	publish_stream,
     	manage_notifications,
     	user_photos,
-    	friends_photos
+    	friends_photos,
     	read_requests,
     	read_mailbox
     </string>

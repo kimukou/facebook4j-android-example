@@ -36,3 +36,5 @@ add write
 
 check hard) 
 - Galaxy Note Android 2.2
+- Nexsus 7    Android 4.2
+- 005SH       Android 2.3.4
