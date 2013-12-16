@@ -18,3 +18,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn facebook4j.**
+-dontnote facebook4j.**
+-keep class facebook4j.** {*;}
+-keep class jp.tekunodo.sns.facebook_main
+
