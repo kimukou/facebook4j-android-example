@@ -50,6 +50,7 @@ public class AuthFbWebView extends WebView {
     private void init()
     {
         WebSettings settings = getSettings();
+        settings.setJavaScriptEnabled(true);
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
     }

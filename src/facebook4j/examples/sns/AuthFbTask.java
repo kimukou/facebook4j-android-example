@@ -34,6 +34,7 @@ import facebook4j.auth.AccessToken;
  */
 @TargetApi(3)
 public class AuthFbTask extends AsyncTask<Object, Void, AuthFbWebView> {
+	private static final String TAG = "AuthFbTask";
 
     private AuthFbWebView mOAuthWebView;
     private URL mCallbackURL;
@@ -106,7 +107,16 @@ public class AuthFbTask extends AsyncTask<Object, Void, AuthFbWebView> {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (!url.startsWith(mCallbackURL.toString())) {
+        	Log.v(TAG,"shouldOverrideUrlLoading::url="+url);
+
+        	boolean result = true;
+            if(url == null){
+                result = super.shouldOverrideUrlLoading(view, url);
+                return result;
+            }
+
+        	
+            if (mCallbackURL!=null && !url.startsWith(mCallbackURL.toString())) {
                 return false;
             }
             Uri uri = Uri.parse(url);
@@ -114,6 +124,23 @@ public class AuthFbTask extends AsyncTask<Object, Void, AuthFbWebView> {
             mLatch.countDown();
             return true;
         }
+        
+    	@Override
+		public void onPageFinished(WebView view, String url) {
+			Log.v(TAG,"onPageFinished::url="+url);
+            if(url == null){
+    			super.onPageFinished(view, url);
+            	return;
+            }
+
+            if (mCallbackURL!=null && !url.startsWith(mCallbackURL.toString())) {
+                return;
+            }
+            Uri uri = Uri.parse(url);
+            mCode = uri.getQueryParameter("code");
+            mLatch.countDown();
+            super.onPageFinished(view, url);
+		}
         
     }
 
